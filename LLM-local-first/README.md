@@ -4,6 +4,8 @@ This project is a local-first LLM playground that runs entirely in the client br
 
 ## Demo
 
+https://github.com/user-attachments/assets/af48a22e-288a-4b3a-8fb9-fc37067d814b
+
 ## What’s included
 
 - React + Rsbuild + Rspack frontend
