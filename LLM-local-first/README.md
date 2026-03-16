@@ -41,12 +41,6 @@ Preview the production build locally:
 npm run preview
 ```
 
-## Notes on local-first LLMs
-
-- The first load can be heavy because the model weights are large.
-- WebGPU is required for best performance. Use a recent Chrome or Edge.
-- Keeping models in `public/` avoids external downloads but increases repo size.
-
 ## Tradeoffs: transformers.js vs WebLLM vs llama.cpp
 
 ### transformers.js
@@ -93,8 +87,8 @@ Cons:
 
 ## Models
 
-If you want to add more MLC models for WebLLM, check the MLC model listings on Hugging Face:
-[https://huggingface.co/models?library=mlc-llm](https://huggingface.co/models?library=mlc-llm)
+If you want to add more MLC models for WebLLM
+[Here](https://github.com/mlc-ai/web-llm/blob/main/src/config.ts#L293)
 
 ## Learn more
 
