@@ -1,252 +1,32 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { CreateMLCEngine } from "@mlc-ai/web-llm";
 import "./App.css";
-
-const MODELS = [
-  {
-    id: "Llama-3.2-1B-Instruct-q4f16_1-MLC",
-    label: "Llama 3.2 1B Instruct (q4f16_1)",
-  },
-  {
-    id: "Llama-3.2-1B-Instruct-q4f32_1-MLC",
-    label: "Llama 3.2 1B Instruct (q4f32_1)",
-  },
-];
-
-const DEFAULT_PROMPT =
-  "Explain in 3 bullet points what a local-first app means on the frontend.";
-
-const createId = () => {
-  if (typeof crypto !== "undefined" && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-  return `chat-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-};
-
-const createConversation = () => ({
-  id: createId(),
-  title: "New chat",
-  messages: [],
-});
-
-const STORAGE_KEY = "localchat:v1";
-
-const readStoredState = () => {
-  try {
-    if (typeof window === "undefined") {
-      return null;
-    }
-    const stored = window.localStorage?.getItem(STORAGE_KEY);
-    if (!stored) {
-      return null;
-    }
-    const parsed = JSON.parse(stored);
-    if (
-      parsed &&
-      Array.isArray(parsed.conversations) &&
-      parsed.conversations.length > 0
-    ) {
-      return parsed;
-    }
-  } catch (error) {
-    // Ignore invalid storage.
-  }
-  return null;
-};
+import { DEFAULT_PROMPT, MODELS } from "./constants";
+import { useConversations } from "./hooks/useConversations";
+import { usePerfStats } from "./hooks/usePerfStats";
+import { useSystemInfo } from "./hooks/useSystemInfo";
 
 const App = () => {
   const engineRef = useRef(null);
-  const initialConversationRef = useRef(null);
-  const storedStateRef = useRef(null);
-
-  if (!initialConversationRef.current) {
-    initialConversationRef.current = createConversation();
-  }
-  if (storedStateRef.current === null) {
-    storedStateRef.current = readStoredState();
-  }
-
-  const storedState = storedStateRef.current;
-
   const [modelId, setModelId] = useState(MODELS[0].id);
   const [loadedModelId, setLoadedModelId] = useState(null);
-  const [supportsWebGPU, setSupportsWebGPU] = useState(true);
   const [status, setStatus] = useState("Ready to load a model.");
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [prompt, setPrompt] = useState(DEFAULT_PROMPT);
   const [systemInfoOpen, setSystemInfoOpen] = useState(false);
-  const [systemInfo, setSystemInfo] = useState({
-    userAgent: "Unknown",
-    language: "Unknown",
-    platform: "Unknown",
-    deviceMemory: null,
-    hardwareConcurrency: null,
-    connection: null,
-    gpu: null,
-    gpuLimits: null,
-  });
-  const [perfStats, setPerfStats] = useState({
-    fps: 0,
-    lastLatencyMs: null,
-    tokensPerSecond: null,
-    generationMs: 0,
-    tokensGenerated: 0,
-    modelLoadProgress: 0,
-    modelLoadLabel: "",
-    jsHeapUsedMB: null,
-    jsHeapTotalMB: null,
-    storageUsedMB: null,
-    storageQuotaMB: null,
-  });
-  const [conversations, setConversations] = useState(() =>
-    storedState?.conversations?.length
-      ? storedState.conversations
-      : [initialConversationRef.current],
-  );
-  const [activeConversationId, setActiveConversationId] = useState(() => {
-    if (storedState?.conversations?.length) {
-      return storedState.activeConversationId || storedState.conversations[0].id;
-    }
-    return initialConversationRef.current.id;
-  });
-
-  useEffect(() => {
-    setSupportsWebGPU(Boolean(navigator.gpu));
-  }, []);
-
-  useEffect(() => {
-    try {
-      const payload = JSON.stringify({
-        conversations,
-        activeConversationId,
-      });
-      window.localStorage?.setItem(STORAGE_KEY, payload);
-    } catch (error) {
-      // Ignore storage errors (quota, privacy mode, etc.)
-    }
-  }, [conversations, activeConversationId]);
-
-  useEffect(() => {
-    const connection =
-      navigator.connection ||
-      navigator.mozConnection ||
-      navigator.webkitConnection;
-    setSystemInfo((prev) => ({
-      ...prev,
-      userAgent: navigator.userAgent ?? "Unknown",
-      language: navigator.language ?? "Unknown",
-      platform: navigator.platform ?? "Unknown",
-      deviceMemory: navigator.deviceMemory ?? null,
-      hardwareConcurrency: navigator.hardwareConcurrency ?? null,
-      connection: connection
-        ? {
-            effectiveType: connection.effectiveType,
-            downlink: connection.downlink,
-            rtt: connection.rtt,
-            saveData: connection.saveData,
-          }
-        : null,
-    }));
-  }, []);
-
-  useEffect(() => {
-    const loadGpuInfo = async () => {
-      if (!navigator.gpu) {
-        return;
-      }
-      try {
-        const adapter = await navigator.gpu.requestAdapter();
-        if (!adapter) {
-          return;
-        }
-        const info = adapter.info || {};
-        setSystemInfo((prev) => ({
-          ...prev,
-          gpu: {
-            vendor: info.vendor ?? "Unknown",
-            architecture: info.architecture ?? "Unknown",
-            device: info.device ?? "Unknown",
-            description: info.description ?? "Unknown",
-          },
-          gpuLimits: adapter.limits
-            ? {
-                maxBufferSize: adapter.limits.maxBufferSize,
-                maxStorageBufferBindingSize:
-                  adapter.limits.maxStorageBufferBindingSize,
-                maxComputeWorkgroupStorageSize:
-                  adapter.limits.maxComputeWorkgroupStorageSize,
-              }
-            : null,
-        }));
-      } catch (error) {
-        setSystemInfo((prev) => ({ ...prev, gpu: { error: "Unavailable" } }));
-      }
-    };
-
-    loadGpuInfo();
-  }, []);
-
-  useEffect(() => {
-    let frame = 0;
-    let last = performance.now();
-    let rafId = null;
-
-    const tick = (now) => {
-      frame += 1;
-      const delta = now - last;
-      if (delta >= 500) {
-        const fps = Math.round((frame / delta) * 1000);
-        setPerfStats((prev) => ({ ...prev, fps }));
-        frame = 0;
-        last = now;
-      }
-      rafId = requestAnimationFrame(tick);
-    };
-
-    rafId = requestAnimationFrame(tick);
-    return () => {
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    let intervalId = null;
-    const poll = async () => {
-      const next = {};
-      if (performance && performance.memory) {
-        const { usedJSHeapSize, totalJSHeapSize } = performance.memory;
-        next.jsHeapUsedMB = Math.round(usedJSHeapSize / (1024 * 1024));
-        next.jsHeapTotalMB = Math.round(totalJSHeapSize / (1024 * 1024));
-      }
-      if (navigator.storage && navigator.storage.estimate) {
-        try {
-          const estimate = await navigator.storage.estimate();
-          if (typeof estimate.usage === "number") {
-            next.storageUsedMB = Math.round(estimate.usage / (1024 * 1024));
-          }
-          if (typeof estimate.quota === "number") {
-            next.storageQuotaMB = Math.round(estimate.quota / (1024 * 1024));
-          }
-        } catch (error) {
-          // Ignore estimation errors.
-        }
-      }
-      if (Object.keys(next).length) {
-        setPerfStats((prev) => ({ ...prev, ...next }));
-      }
-    };
-
-    intervalId = window.setInterval(poll, 1500);
-    poll();
-    return () => {
-      if (intervalId) {
-        window.clearInterval(intervalId);
-      }
-    };
-  }, []);
+  const { systemInfo, supportsWebGPU } = useSystemInfo();
+  const { perfStats, setPerfStats } = usePerfStats();
+  const {
+    conversations,
+    activeConversationId,
+    setActiveConversationId,
+    activeConversation,
+    startNewConversation,
+    appendMessage,
+    updateLastAssistantMessage,
+    clearConversation,
+  } = useConversations();
 
   const handleModelChange = (event) => {
     const nextModel = event.target.value;
@@ -308,53 +88,6 @@ const App = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const activeConversation = conversations.find(
-    (conversation) => conversation.id === activeConversationId,
-  );
-
-  const updateConversation = (conversationId, updater) => {
-    setConversations((prev) =>
-      prev.map((conversation) =>
-        conversation.id === conversationId
-          ? updater(conversation)
-          : conversation,
-      ),
-    );
-  };
-
-  const startNewConversation = () => {
-    const next = createConversation();
-    setConversations((prev) => [next, ...prev]);
-    setActiveConversationId(next.id);
-    setPrompt("");
-  };
-
-  const appendMessage = (conversationId, message) => {
-    updateConversation(conversationId, (conversation) => {
-      const nextMessages = [...conversation.messages, message];
-      const nextTitle =
-        conversation.title === "New chat" && message.role === "user"
-          ? message.content.slice(0, 32)
-          : conversation.title;
-      return { ...conversation, messages: nextMessages, title: nextTitle };
-    });
-  };
-
-  const updateLastAssistantMessage = (conversationId, content) => {
-    updateConversation(conversationId, (conversation) => {
-      const nextMessages = [...conversation.messages];
-      if (nextMessages.length === 0) {
-        return conversation;
-      }
-      const lastIndex = nextMessages.length - 1;
-      nextMessages[lastIndex] = {
-        ...nextMessages[lastIndex],
-        content,
-      };
-      return { ...conversation, messages: nextMessages };
-    });
   };
 
   const generate = async () => {
@@ -448,15 +181,8 @@ const App = () => {
     }
   };
 
-  const clearConversation = () => {
-    if (!activeConversation) {
-      return;
-    }
-    updateConversation(activeConversation.id, (conversation) => ({
-      ...conversation,
-      title: "New chat",
-      messages: [],
-    }));
+  const handleClearConversation = () => {
+    clearConversation();
     setStatus("Cleared. Ready to generate.");
   };
 
@@ -643,7 +369,10 @@ const App = () => {
           <button
             type="button"
             className="ghost"
-            onClick={startNewConversation}
+            onClick={() => {
+              startNewConversation();
+              setPrompt("");
+            }}
           >
             New chat
           </button>
@@ -680,7 +409,7 @@ const App = () => {
           <button
             type="button"
             className="ghost"
-            onClick={clearConversation}
+            onClick={handleClearConversation}
             disabled={!activeConversation || isGenerating}
           >
             Clear chat
