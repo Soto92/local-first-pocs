@@ -9,6 +9,10 @@ This is a minimal **local-first** app that runs entirely in the browser using **
 - Lets you create items in the UI
 - Lists all items from the local DB
 
+## Demo
+
+<img width="1904" height="676" alt="demo" src="https://github.com/user-attachments/assets/bcc98e12-fe8f-4e7b-a4bf-01c45bbbdafb" />
+
 ## How to run
 
 You can simply open the file in a browser:
