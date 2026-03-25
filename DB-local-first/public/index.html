@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Local-First SQLite Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header>
+        <h1>Local-First SQLite Demo</h1>
+        <p>Create items locally and list them from the database.</p>
+      </header>
+
+      <section class="card">
+        <form id="item-form">
+          <label>
+            Title
+            <input id="title" type="text" placeholder="New item" required />
+          </label>
+          <label>
+            Status
+            <select id="status">
+              <option value="todo">todo</option>
+              <option value="doing">doing</option>
+              <option value="done">done</option>
+            </select>
+          </label>
+          <button type="submit">Add</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="list-header">
+          <h2>Items</h2>
+          <button id="refresh">Refresh</button>
+        </div>
+        <ul id="items"></ul>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
