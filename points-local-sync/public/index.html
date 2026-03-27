@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Local-First Points</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header>
+        <h1>Local-First Points</h1>
+        <p>Pick a person, rate with a face, save locally, then sync to SQLite.</p>
+      </header>
+
+      <section class="card">
+        <form id="rating-form">
+          <label>
+            Name
+            <input id="name" list="people-list" placeholder="Type a name" required />
+          </label>
+          <datalist id="people-list"></datalist>
+
+          <div class="faces">
+            <button type="button" class="face" data-face="green" aria-pressed="false">🙂</button>
+            <button type="button" class="face" data-face="yellow" aria-pressed="false">😐</button>
+            <button type="button" class="face" data-face="red" aria-pressed="false">🙁</button>
+          </div>
+
+          <button type="submit" class="primary">Save</button>
+        </form>
+
+        <div class="status">
+          <span id="local-status">No changes yet.</span>
+          <span id="sync-status">Sync idle.</span>
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="card">
+          <div class="list-header">
+            <h2>People (Local Totals)</h2>
+            <button id="refresh">Refresh</button>
+          </div>
+          <ul id="people"></ul>
+        </div>
+
+        <div class="card" id="details-card">
+          <h2>Details</h2>
+          <div id="details-empty">Select a person to see details.</div>
+          <div id="details" hidden>
+            <div class="details-header">
+              <div>
+                <div class="label">Person</div>
+                <div id="details-name" class="value"></div>
+              </div>
+              <div>
+                <div class="label">Total Points</div>
+                <div id="details-score" class="value"></div>
+              </div>
+            </div>
+
+            <div class="chips">
+              <div class="chip green"><span id="count-green">0</span> green</div>
+              <div class="chip yellow"><span id="count-yellow">0</span> yellow</div>
+              <div class="chip red"><span id="count-red">0</span> red</div>
+            </div>
+
+            <div class="details-actions">
+              <div class="label">Rate this person</div>
+              <div class="faces">
+                <button type="button" class="face" data-face="green" aria-pressed="false">🙂</button>
+                <button type="button" class="face" data-face="yellow" aria-pressed="false">😐</button>
+                <button type="button" class="face" data-face="red" aria-pressed="false">🙁</button>
+              </div>
+              <button id="save-detail" class="primary">Save Rating</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
