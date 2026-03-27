@@ -18,7 +18,7 @@ This is a minimal **local-first** app that runs entirely in the browser using **
 You can simply open the file in a browser:
 
 ```
-C:\Users\Mauricio\Git\local-first-pocs\DB-local-first\public\index.html
+C:\{PATH}\local-first-pocs\DB-local-first\public\index.html
 ```
 
 Optional: if you prefer a local static server, any simple static server will work.
