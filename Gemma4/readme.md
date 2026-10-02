@@ -25,3 +25,17 @@ ollama run gemma4
 ```
 ollama run gemma4:31b
 ```
+
+## My test results, perceptions and conclusions:
+
+The model works well using just Ollama, but for basic tasks—such as reading or writing files—the raw model falls short; it simply answers your questions. If you want it to access the file system, you need to use an orchestrator with agents and scripts, such as Claude, OpenCode, or LM Studio by Bionic.
+
+Another failure was using the VS Code "Continue" extension; the files ended up with a lot of strange symbols in the code (with absolutely no formatting:
+
+```
+"conts mock: { key: "/bike")
+```
+
+I noticed that OpenCode works and responds to simple queries, but it freezes up when I ask it to implement something; I don't think OpenCode is very good for running local models—it seems to handle too many tasks simultaneously, consuming a lot of GPU and RAM.
+
+Things started working much better with LM Studio; I granted full read/write access to the system, and it built the entire site in just under two hours. My Dell G15 gaming laptop sounded like it was about to take off (loud fan noise), and here is the result:
