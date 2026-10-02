@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rocket777 | Bike Shop</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="top-bar">
+        <span>REFER YOUR FRIENDS, GET 5% OFF! <a href="#" style="color: white;">Learn More</a></span>
+        <div>
+            <span>My Garage</span> | 
+            <span>Sign in</span> | 
+            <span>Contact Us</span> | 
+            <span>My Cart (0)</span>
+        </div>
+    </div>
+
+    <header>
+        <div class="nav-container">
+            <div class="logo">ROCKET<span>777</span></div>
+            <div class="search-bar">
+                <input type="text" id="homeSearch" placeholder="Search by keyword or part number">
+                <button id="homeSearchBtn">🔍</button>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#">ATV</a></li>
+                    <li><a href="#">Dirt Bikes</a></li>
+                    <li><a href="#">E-Bikes</a></li>
+                    <li><a href="#">Brands</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>REV UP YOUR RIDE:</h1>
+            <p>Find your perfect parts here</p>
+            <a href="#products" class="btn-shop">SHOP NOW</a>
+        </div>
+    </section>
+
+    <section class="vehicle-selector">
+        <span>SELECT YOUR VEHICLE</span>
+        <select><option>Type</option></select>
+        <select><option>Year</option></select>
+        <select><option>Make</option></select>
+        <select><option>Model</option></select>
+        <button class="btn-find">FIND</button>
+        <button class="btn-find" style="background-color: #555;">RESET</button>
+    </section>
+
+    <main class="container" id="products">
+        <h2>Our Bikes</h2>
+        <div id="homeProductGrid" class="grid" style="margin-top: 2rem;">
+            <!-- Products will be loaded here -->
+        </div>
+    </main>
+
+    <footer>
+        <div class="container" style="text-align: center; border-top: 1px solid #ccc; padding-top: 2rem;">
+            <p>&copy; 2026 Rocket777 Bike Shop. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>

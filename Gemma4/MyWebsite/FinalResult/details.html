@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | Rocket777</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <div class="logo">ROCKET<span>777</span></div>
+            <div class="search-bar">
+                <input type="text" id="detailsSearch" placeholder="Search by keyword or part number">
+                <button id="detailsSearchBtn">🔍</button>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#">ATV</a></li>
+                    <li><a href="#">Dirt Bikes</a></li>
+                    <li><a href="#">E-Bikes</a></li>
+                    <li><a href="#">Brands</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="productDetails" style="display: flex; gap: 3rem; flex-wrap: wrap;">
+            <div id="productImg" style="flex: 1; min-width: 300px;">
+                <img src="" alt="" style="width: 100%; border-radius: 8px;">
+            </div>
+            <div id="productInfo" style="flex: 1; min-width: 300px;">
+                <h1 id="detailTitle"></h1>
+                <p id="detailCategory" style="color: #666;"></p>
+                <p id="detailDescription" style="margin: 1.5rem 0; line-height: 1.6;"></p>
+                <p class="price" id="detailPrice"></p>
+                <div class="rating" id="detailRating"></div>
+                <button class="btn-shop" style="display: inline-block;">Add to Cart</button>
+                <a href="results.html" style="margin-left: 1rem; color: #003399;">Back to results</a>
+            </div>
+        </div>
+
+        <div id="loader" class="loader" style="display: none;"></div>
+        <div id="error" class="error-message" style="display: none;"></div>
+    </main>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
